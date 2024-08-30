@@ -3,9 +3,10 @@ import { DataLoader } from "./utils/data-loader";
 import { Page } from "./models/page";
 import { Builder } from "./models/builder";
 import { Bucket } from "./models/bucket";
+import { Query } from "./models/Query";
 
-let pages: Page[] = [];
-let buckets: Bucket[] = [];
+export let pages: Page[] = [];
+export let buckets: Bucket[] = [];
 
 const router: Router = Router();
 
@@ -27,6 +28,14 @@ router.post("/init/:pageSize", (req: Request, res: Response) => {
   // calculate colission and overflow
 
   return res.status(200).send();
+});
+
+router.get("/tablescan/:item", (req: Request, res: Response) => {
+  if (!req?.params?.item) {
+    return res.status(400).send("provide the item");
+  }
+
+  return res.status(200).send(Query.tableScan(req.params.item));
 });
 
 export default router;
