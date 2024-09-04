@@ -25,8 +25,6 @@ router.post("/init/:pageSize", (req: Request, res: Response) => {
 
   console.log(buckets);
 
-  // calculate colission and overflow
-
   return res.status(200).send();
 });
 
@@ -36,6 +34,14 @@ router.get("/tablescan/:item", (req: Request, res: Response) => {
   }
 
   return res.status(200).send(Query.tableScan(req.params.item));
+});
+
+router.get("/hashSearch/:item", (req: Request, res: Response) => {
+  if (!req?.params?.item) {
+    return res.status(400).send("provide the item");
+  }
+
+  return res.status(200).send(Query.hashSearch(req.params.item));
 });
 
 export default router;
