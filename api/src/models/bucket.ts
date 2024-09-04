@@ -6,17 +6,18 @@ export interface Reference {
 
 export class Bucket {
   public id: number;
-  public refs: Reference[];
+  public refs: Reference[][]
 
   constructor(id: number) {
     this.id = id;
-    this.refs = [];
+    this.refs = [[]]
   }
 
   addRef(ref: Reference): void {
-    // TODO handle colission
-    if (this.refs.length < BUCKET_SIZE) {
-      this.refs.push(ref);
+    if (this.refs[this.refs.length - 1].length < BUCKET_SIZE) {
+      this.refs[this.refs.length - 1].push(ref);
+    }else{
+      this.refs.push([ref]);
     }
   }
 }
