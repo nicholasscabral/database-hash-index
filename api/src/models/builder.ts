@@ -23,9 +23,8 @@ export class Builder {
   }
 
   static createBuckets(pages: Page[]): CreateBucketResult {
-    const numBuckets: number = Math.ceil(
-      pages.reduce((a, c) => a + c.items.length, 0) / BUCKET_SIZE
-    );
+    const totalWords = pages.reduce((a, c) => a + c.items.length, 0);
+    const numBuckets: number = Math.ceil(totalWords / BUCKET_SIZE);
     const buckets: Bucket[] = Array.from(
       { length: numBuckets },
       (_, i) => new Bucket(i)
@@ -46,6 +45,10 @@ export class Builder {
       }
     }
 
-    return { overflows, colissions, buckets };
+    return {
+      overflows: 100 * Number((overflows / numBuckets).toFixed(2)),
+      colissions: 100 * Number((colissions / totalWords).toFixed(2)),
+      buckets,
+    };
   }
 }

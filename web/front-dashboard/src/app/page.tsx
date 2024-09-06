@@ -5,6 +5,7 @@ import { useState } from "react";
 type ApiResponse = {
   items: string[];
   cost: number;
+  pageNumber: number;
 };
 
 export default function Home() {
@@ -118,7 +119,7 @@ export default function Home() {
 
         {message && <p className="text-black mt-4">{message}</p>}
 
-        {!!overflows && !!colissions && <p className="text-black my-4">Colisões: {colissions}, Overflows: {overflows}</p>}
+        {!!overflows && !!colissions && <p className="text-black my-4">Colisões: {colissions}%, Overflows: {overflows}%</p>}
 
         {!!overflows && !!colissions && (
           <div className="mb-6">
@@ -149,7 +150,7 @@ export default function Home() {
         {response && (
           <div className="mt-6 rounded-lg p-2 w-[20vw] shadow-[rgba(17,_17,_26,_0.1)_0px_0px_16px]">
             <h2 className="text-xl font-semibold">Resultado da busca:</h2>
-            <p className="text-gray-700">Custo: {response.cost}</p>
+            <p className="text-gray-700">Custo: {response.cost}, numero da pagina {response.pageNumber}</p>
             <ul className="list-disc pl-5">
               {response.items.slice(0, visibleItems).map((item, index) => (
                 <li key={index} className="text-gray-700">

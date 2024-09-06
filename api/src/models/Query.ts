@@ -6,25 +6,29 @@ import { BUCKET_SIZE } from "./bucket";
 interface TableScanResult {
   items: string[];
   cost: number;
+  pageNumber: number;
 }
 
 interface hashSearchResult {
   items: string[];
   cost: number;
+  pageNumber: number;
 }
 
 export class Query {
   static tableScan(item: string): TableScanResult {
     const result: string[] = [];
     let cost: number = 0;
+    let pageNumber: number = 0;
 
     let found = false;
-    for (const page of pages) {
+    for (const [index, page] of pages.entries()) {
       cost++;
       for (const pageItem of page.items) {
         result.push(pageItem);
         if (pageItem === item) {
           found = true;
+          pageNumber = index;
           break;
         }
       }
@@ -33,7 +37,7 @@ export class Query {
       }
     }
 
-    return { items: result, cost };
+    return { items: result, cost, pageNumber };
   }
 
   static hashSearch(item: string): hashSearchResult {
@@ -42,27 +46,27 @@ export class Query {
     );
     const hashWord = hash(item, numBuckets);
 
-    const findedBucket = buckets[hashWord];
-    let indexPage = 0;
-    for (const ref of findedBucket.refs) {
+    const bucketFound = buckets[hashWord];
+    let pageNumber = 0;
+    for (const ref of bucketFound.refs) {
       const tuple = ref.find((obj) => obj.hasOwnProperty(item));
       if (tuple) {
-        indexPage = tuple[item];
+        pageNumber = tuple[item];
         break;
       }
     }
 
-    const findedPage = pages[indexPage];
+    const pageFound = pages[pageNumber];
     const result: string[] = [];
     const cost: number = 1;
 
-    for (const word of findedPage.items) {
+    for (const word of pageFound.items) {
       result.push(word);
       if (item === word) {
         break;
       }
     }
 
-    return { items: result, cost };
+    return { items: result, cost, pageNumber };
   }
 }
