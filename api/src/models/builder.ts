@@ -2,6 +2,12 @@ import { hash } from "../utils/hash";
 import { Bucket, BUCKET_SIZE } from "./bucket";
 import { Page } from "./page";
 
+export interface CreateBucketResult {
+  colissions: number;
+  overflows: number;
+  buckets: Bucket[];
+}
+
 export class Builder {
   static createPages(items: string[], pageSize: number): Page[] {
     const pages: Page[] = [];
@@ -16,7 +22,7 @@ export class Builder {
     return pages;
   }
 
-  static createBuckets(pages: Page[]): Bucket[] {
+  static createBuckets(pages: Page[]): CreateBucketResult {
     const numBuckets: number = Math.ceil(
       pages.reduce((a, c) => a + c.items.length, 0) / BUCKET_SIZE
     );
@@ -25,16 +31,21 @@ export class Builder {
       (_, i) => new Bucket(i)
     );
 
+    let colissions: number = 0;
+    let overflows: number = 0;
+
     for (const page of pages) {
       for (const item of page.items) {
         const hashedValue: number = hash(item, numBuckets);
 
-        if (hashedValue > numBuckets) console.log("deu zebra");
+        const { colissions: addedColission, overflows: addedOverflow } =
+          buckets[hashedValue].addRef({ [item]: page.id });
 
-        buckets[hashedValue].addRef({ [item]: page.id });
+        colissions += addedColission;
+        overflows += addedOverflow;
       }
     }
 
-    return buckets;
+    return { overflows, colissions, buckets };
   }
 }

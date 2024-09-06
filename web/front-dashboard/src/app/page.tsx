@@ -13,6 +13,8 @@ export default function Home() {
   const [message, setMessage] = useState<string>("");
   const [response, setResponse] = useState<ApiResponse | null>(null);
   const [visibleItems, setVisibleItems] = useState<number>(10000);
+  const [colissions, setColissions] = useState<number>(0);
+  const [overflows, setOverflows] = useState<number>(0);
 
   const handleInit = async () => {
     if (!pageSize) {
@@ -23,11 +25,14 @@ export default function Home() {
     try {
       const response = await fetch(`/api/init/${pageSize}`, {
         method: "POST",
-      });
+      })
+      const data = await response.json();
 
       if (!response.ok) {
         setMessage("Erro ao criar as páginas.");
       } else {
+        setColissions(data.colissions);
+        setOverflows(data.overflows);
         setMessage("Páginas criadas com sucesso.");
       }
     } catch (error) {
@@ -51,7 +56,7 @@ export default function Home() {
         const data: ApiResponse = await res.json();
         setResponse(data);
         setMessage(`Table scan completo.`);
-        setVisibleItems(10000); 
+        setVisibleItems(10000);
       }
     } catch (error) {
       setMessage("Erro ao executar table scan.");
@@ -102,7 +107,7 @@ export default function Home() {
             placeholder="Page Size"
             className="border p-2 rounded mb-2 shadow-[rgba(17,_17,_26,_0.1)_0px_0px_16px] w-[2-vw]"
           />
-          <br/>
+          <br />
           <button
             onClick={handleInit}
             className="bg-blue-500 text-white py-2 px-4 rounded"
@@ -111,30 +116,35 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="mb-6">
-          <input
-            type="text"
-            value={item}
-            onChange={(e) => setItem(e.target.value)}
-            placeholder="Item"
-            className="border p-2 rounded mb-2 shadow-[rgba(17,_17,_26,_0.1)_0px_0px_16px] w-[2-vw]"
-          />
-          <br/>
-          <button
-            onClick={handleTableScan}
-            className="bg-green-500 text-white py-2 px-4 rounded mr-2"
-          >
-            Table Scan
-          </button>
-          <button
-            onClick={handleHashSearch}
-            className="bg-red-500 text-white py-2 px-4 rounded"
-          >
-            Hash Search
-          </button>
-        </div>
+        {message && <p className="text-black mt-4">{message}</p>}
 
-        {message && <p className="text-red-500 mt-4">{message}</p>}
+        {!!overflows && !!colissions && <p className="text-black my-4">Colisões: {colissions}, Overflows: {overflows}</p>}
+
+        {!!overflows && !!colissions && (
+          <div className="mb-6">
+            <input
+              type="text"
+              value={item}
+              onChange={(e) => setItem(e.target.value)}
+              placeholder="Item"
+              className="border p-2 rounded mb-2 shadow-[rgba(17,_17,_26,_0.1)_0px_0px_16px] w-[2-vw]"
+            />
+            <br />
+            <button
+              onClick={handleTableScan}
+              className="bg-green-500 text-white py-2 px-4 rounded mr-2"
+            >
+              Table Scan
+            </button>
+            <button
+              onClick={handleHashSearch}
+              className="bg-red-500 text-white py-2 px-4 rounded"
+            >
+              Hash Search
+            </button>
+          </div>
+        )}
+
 
         {response && (
           <div className="mt-6 rounded-lg p-2 w-[20vw] shadow-[rgba(17,_17,_26,_0.1)_0px_0px_16px]">
@@ -158,6 +168,6 @@ export default function Home() {
           </div>
         )}
       </div>
-      </div>
+    </div>
   );
 }

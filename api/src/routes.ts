@@ -21,11 +21,18 @@ router.post("/init/:pageSize", (req: Request, res: Response) => {
 
   pages = Builder.createPages(items, pageSize);
 
-  buckets = Builder.createBuckets(pages);
+  const {
+    colissions,
+    overflows,
+    buckets: _buckets,
+  } = Builder.createBuckets(pages);
 
-  console.log(buckets);
+  buckets = _buckets;
 
-  return res.status(200).send();
+  return res.status(200).send({
+    colissions,
+    overflows,
+  });
 });
 
 router.get("/tablescan/:item", (req: Request, res: Response) => {
